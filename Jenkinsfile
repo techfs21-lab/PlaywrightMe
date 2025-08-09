@@ -1,38 +1,49 @@
 pipeline {
     agent any
+
     stages {
-        stage('Install Dependencies') {
+        stage('Clean workspace') {
             steps {
-                dir('C:\\Users\\admin\\Desktop\\PlayWrightMe') {
-                    bat 'npm ci'
-                }
+                deleteDir()
             }
         }
-        stage('Install Playwright Browsers') {
+        stage('Checkout') {
             steps {
-                dir('C:\\Users\\admin\\Desktop\\PlayWrightMe') {
-                    bat 'npx playwright install'
-                }
+                checkout scm
             }
         }
-        stage('Run Tests') {
+        stage('Install dependencies') {
             steps {
-                dir('C:\\Users\\admin\\Desktop\\PlayWrightMe') {
-                    bat 'npx playwright test --reporter=html'
-                }
+                bat 'npm ci'
             }
         }
-    }
-    post {
-        always {
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Playwright Test Report'
-            ])
+        stage('Install Playwright browsers') {
+            steps {
+                bat 'npx playwright install'
+            }
+        }
+        stage('Run Playwright tests') {
+            steps {
+                bat 'npx playwright test --headed --reporter=html'
+            }
+        }
+        stage('Wait before publishing report') {
+            steps {
+                // Wait 5 seconds to ensure all files are closed
+                sleep(time: 5, unit: 'SECONDS')
+            }
+        }
+        stage('Publish HTML report') {
+            steps {
+                publishHTML (target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Test Report'
+                ])
+            }
         }
     }
 }
