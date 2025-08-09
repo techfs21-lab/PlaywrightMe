@@ -18,7 +18,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('C:\\Users\\admin\\Desktop\\PlayWrightMe') {
-                    bat 'npx playwright test'
+                    bat 'npx playwright test --reporter=html'
                 }
             }
         }
