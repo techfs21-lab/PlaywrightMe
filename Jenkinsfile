@@ -27,6 +27,9 @@ pipeline {
                 bat 'npx playwright test --headed --reporter=html'
             }
         }
+
+
+        /*
         stage('Wait before publishing report') {
             steps {
                 // Wait 5 seconds to ensure all files are closed
@@ -45,5 +48,6 @@ pipeline {
                 ])
             }
         }
+        */
     }
 }
